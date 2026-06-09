@@ -1,0 +1,35 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+@theme {
+  --color-primary-500: #06b6d4; /* cyan-500 */
+  --color-primary-600: #0891b2; /* cyan-600 */
+  --color-surface-950: #020617; /* slate-950 */
+}
+
+/* Custom base styles */
+@layer base {
+  html,
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500/30;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Custom scrollbar */
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-950;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+  }
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition-duration: 300ms;
+}
