@@ -1,0 +1,54 @@
+[
+  {
+    "version": "1.2.0",
+    "date": "2025-01-15",
+    "type": "feature",
+    "title": "Nuevos paneles por rol",
+    "description": "Lanzamos dashboards específicos para familias, escuelas, empresas y Plan Ceibal con permisos granulares.",
+    "changes": [
+      "Panel familiar con misiones y GuardTokens",
+      "Panel escolar con modo aula y gestión por grupo",
+      "Panel empresarial con auditoría por departamento",
+      "Panel Ceibal con despliegue institucional"
+    ]
+  },
+  {
+    "version": "1.1.0",
+    "date": "2024-12-20",
+    "type": "feature",
+    "title": "Integración con Mercado Pago",
+    "description": "Checkout nativo para LATAM con facturación automática y gestión de suscripciones.",
+    "changes": [
+      "Pagos con Mercado Pago",
+      "Facturación automática",
+      "Gestión de suscripciones",
+      "Webhooks para sincronización"
+    ]
+  },
+  {
+    "version": "1.0.5",
+    "date": "2024-12-01",
+    "type": "improvement",
+    "title": "Mejoras en el Device Agent",
+    "description": "Optimizaciones de rendimiento y estabilidad del agente local.",
+    "changes": [
+      "Reducido consumo de CPU en un 40%",
+      "Mejor detección de aplicaciones",
+      "Sincronización más rápida",
+      "Logs más detallados para debugging"
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2024-11-15",
+    "type": "release",
+    "title": "Lanzamiento inicial",
+    "description": "Primera versión estable de ByeBut con control parental soberano.",
+    "changes": [
+      "Control de tiempo de uso",
+      "Reglas por dispositivo",
+      "Monitoreo local en tiempo real",
+      "Panel web responsive"
+    ]
+  }
+]

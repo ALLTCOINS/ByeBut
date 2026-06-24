@@ -1,0 +1,16 @@
+/* glassStyles.css – utilidades reutilizables */
+
+/* Tarjetas premium con efecto glass‑morphism */
+.glass-card-premium {
+  @apply glass-card border-white/10 neon-border-cyan;
+}
+
+/* Tarjetas de advertencia (ej. modal premium) */
+.glass-card-warning {
+  @apply glass-card border-amber-500/30 neon-border-magenta;
+}
+
+/* Ring de foco para botones accesibles */
+.focus-ring-cyan {
+  @apply focus:outline-none focus:ring-2 focus:ring-cyan-400;
+}

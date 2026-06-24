@@ -12,7 +12,21 @@
   html,
   body {
     @apply bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500/30;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-manrope), system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.08), transparent 22%),
+      radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.06), transparent 18%),
+      radial-gradient(circle at 50% 100%, rgba(234, 88, 12, 0.05), transparent 24%),
+      #020617;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-space-grotesk), var(--font-manrope), system-ui, sans-serif;
+    letter-spacing: -0.03em;
   }
 }
 
@@ -32,4 +46,75 @@
 /* Smooth transitions */
 .transition-all {
   transition-duration: 300ms;
+}
+
+/* Premium micro-interactions */
+@layer utilities {
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .gradient-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+.glass-panel {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.84));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow:
+    0 24px 80px rgba(2, 6, 23, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px);
+}
+
+.tech-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.soft-glow {
+  position: relative;
+}
+
+.soft-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(16, 185, 129, 0.12), rgba(249, 115, 22, 0.12));
+  filter: blur(18px);
+  opacity: 0.9;
+  z-index: -1;
 }

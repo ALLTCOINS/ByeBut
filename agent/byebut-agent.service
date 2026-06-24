@@ -1,0 +1,15 @@
+[Unit]
+Description=ByeBut Device Agent
+After=network.target
+
+[Service]
+Type=simple
+User=your-username
+WorkingDirectory=/path/to/byebut/agent
+ExecStart=/usr/bin/python3 /path/to/byebut/agent/byebut_agent.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

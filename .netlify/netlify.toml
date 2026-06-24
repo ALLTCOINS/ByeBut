@@ -1,0 +1,36 @@
+functionsDirectory = "C:\\Projects\\ByeBut2.0\\byebut\\.netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[[plugins]]
+origin = "default"
+package = "@netlify/plugin-nextjs"
+
+[plugins.inputs]
+
+[build]
+publish = "C:\\Projects\\ByeBut2.0\\byebut\\.next"
+publishOrigin = "ui"
+commandOrigin = "config"
+command = "pnpm build"
+functions = "C:\\Projects\\ByeBut2.0\\byebut\\.netlify\\functions"
+
+[build.environment]
+NODE_ENV = "production"
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]

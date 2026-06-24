@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { subscriptionClient } from '@/lib/mercadopago';
+import { validateRequest, createSubscriptionSchema } from '@/lib/validations';
+import { createSupabaseRequestContext } from '@/lib/supabase/server-auth';
 
-/**
- * Mapeo de precios y configuraciones por plan
- */
 const PLAN_CONFIGS = {
   individual: {
     amount: 9,
@@ -21,32 +20,38 @@ const PLAN_CONFIGS = {
     reason: 'ByeBut Plan Institucional',
     devices: 100,
   },
-};
+} as const;
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    
-    // 1. Verificar sesión del usuario
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    const body = await request.json();
+    const validation = validateRequest(createSubscriptionSchema, body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error, details: validation.details },
+        { status: 400 }
+      );
     }
 
-    // 2. Obtener datos del body
-    const { plan } = await request.json();
-    
-    if (!plan || !PLAN_CONFIGS[plan as keyof typeof PLAN_CONFIGS]) {
-      return NextResponse.json({ error: 'Plan inválido' }, { status: 400 });
+    const { plan } = validation.data;
+    const { ctx, error: authError } = await createSupabaseRequestContext(request, 'user');
+
+    if (authError || !ctx?.userClaims?.id) {
+      return NextResponse.json(
+        { error: authError?.message ?? 'No autorizado' },
+        { status: authError?.status ?? 401 }
+      );
     }
 
-    const config = PLAN_CONFIGS[plan as keyof typeof PLAN_CONFIGS];
+    const config = PLAN_CONFIGS[plan];
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const userId = ctx.userClaims.id;
+    const userEmail = ctx.userClaims.email;
 
-    // 3. Crear suscripción (PreApproval) en Mercado Pago
     const subscription = await subscriptionClient.create({
       body: {
-        back_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+        back_url: `${appUrl}/dashboard?view=familia&status=success`,
         reason: config.reason,
         auto_recurring: {
           frequency: 1,
@@ -54,37 +59,54 @@ export async function POST(request: Request) {
           transaction_amount: config.amount,
           currency_id: 'USD',
         },
-        payer_email: user.email,
+        payer_email: userEmail,
         status: 'pending',
-      }
+        metadata: {
+          user_id: userId,
+          plan,
+          devices_allowed: config.devices,
+        },
+      } as import('mercadopago/dist/clients/preApproval/commonTypes').PreApprovalRequest & { metadata: Record<string, unknown> },
     });
 
-    if (!subscription.init_point) {
-      throw new Error('No se pudo generar el punto de inicio de Mercado Pago');
+    if (!subscription.id) {
+      throw new Error('No se pudo generar la suscripción de Mercado Pago');
     }
 
-    // 4. Actualizar tabla de suscripciones en Supabase
-    const { error: dbError } = await supabase
+    const { error: dbError } = await supabaseAdmin
       .from('subscriptions')
-      .upsert({
-        user_id: user.id,
-        plan: plan,
-        status: 'inactive',
-        mercadopago_subscription_id: subscription.id,
-        devices_allowed: config.devices,
-      }, { onConflict: 'user_id' });
+      .upsert(
+        {
+          user_id: userId,
+          plan,
+          status: 'inactive',
+          mercadopago_subscription_id: subscription.id,
+          devices_allowed: config.devices,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      );
 
     if (dbError) {
-      console.error('Error actualizando suscripción en DB:', dbError);
+      throw dbError;
     }
 
-    // 5. Devolver URL para redirigir al usuario al checkout de MP
-    return NextResponse.json({ url: subscription.init_point });
+    const checkoutUrl = subscription.init_point;
 
-  } catch (error: any) {
+    if (!checkoutUrl) {
+      throw new Error('Mercado Pago no devolvió una URL de checkout');
+    }
+
+    return NextResponse.json({
+      url: checkoutUrl,
+      subscriptionId: subscription.id,
+      plan,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error interno del servidor';
     console.error('Error en create-subscription:', error);
     return NextResponse.json(
-      { error: error.message || 'Error interno del servidor' },
+      { error: message },
       { status: 500 }
     );
   }
