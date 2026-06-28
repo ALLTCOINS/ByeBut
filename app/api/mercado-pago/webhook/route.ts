@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const dataId = url.searchParams.get('data.id') || '';
 
     const bodyText = await request.text();
-    let payload: Record<string, unknown> = {};
+    let payload: Record<string, unknown> & { data?: { id?: string } } = {};
     try {
       if (bodyText) {
         payload = JSON.parse(bodyText);
